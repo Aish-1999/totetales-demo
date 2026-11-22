@@ -1,0 +1,388 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ToteTales Demo</title>
+<style>
+:root{--plum:#3D1A3A;--plum2:#2A1E2C;--mari:#F4A62A;--coral:#E85D75;--teal:#1A8C83;--mist:#E6DCE3;--cream:#FBF7F2;--ink:#2A1E2C}
+*{box-sizing:border-box}
+body{margin:0;font-family:Calibri,"Segoe UI",system-ui,sans-serif;background:var(--cream);color:var(--ink)}
+h1,h2,h3{font-family:Cambria,Georgia,serif;margin:0}
+header{background:var(--plum);color:#fff;padding:14px 24px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+header .logo{font-family:Cambria,Georgia,serif;font-size:26px;font-weight:700}
+header .logo span{color:var(--mari)}
+header .tag{opacity:.8;font-size:14px}
+header .demo{margin-left:auto;background:var(--mari);color:var(--plum);font-weight:700;font-size:12px;padding:4px 10px;border-radius:99px}
+.steps{display:flex;gap:6px;padding:14px 24px;background:#fff;border-bottom:1px solid var(--mist);overflow-x:auto}
+.steps button{border:0;background:var(--mist);color:var(--plum);padding:8px 14px;border-radius:99px;font:inherit;font-weight:600;cursor:pointer;white-space:nowrap}
+.steps button.on{background:var(--plum);color:#fff}
+.steps button.done{background:var(--teal);color:#fff}
+main{display:grid;grid-template-columns:minmax(0,1fr) 420px;gap:24px;padding:24px;max-width:1200px;margin:auto}
+@media(max-width:900px){main{grid-template-columns:1fr;padding:16px}.preview{position:static!important}}
+.panel{background:#fff;border-radius:18px;padding:22px;box-shadow:0 2px 12px rgba(61,26,58,.08)}
+.panel h2{color:var(--plum);margin-bottom:4px}
+.hint{color:#6b5a68;margin:0 0 16px;font-size:15px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:12px}
+.card{border:2px solid var(--mist);border-radius:14px;padding:12px;text-align:center;cursor:pointer;background:#fff;font:inherit;color:inherit;transition:.15s}
+.card:hover{border-color:var(--mari);transform:translateY(-2px)}
+.card.sel{border-color:var(--plum);background:#f7f0f5;box-shadow:0 0 0 3px rgba(244,166,42,.35)}
+.card b{display:block;font-size:20px;color:var(--plum)}
+.card small{color:#6b5a68}
+.card canvas{width:100%;aspect-ratio:1;border-radius:10px;background:var(--cream)}
+.tabs{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.tabs button{border:2px solid var(--plum);background:#fff;color:var(--plum);border-radius:10px;padding:8px 14px;font:inherit;font-weight:600;cursor:pointer}
+.tabs button.on{background:var(--plum);color:#fff}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:10px 0}
+label.l{font-weight:700;color:var(--plum);display:block;margin:14px 0 6px}
+input[type=text],input[type=email],input[type=url],input[type=number],select,textarea{font:inherit;padding:9px 12px;border:2px solid var(--mist);border-radius:10px;width:100%;background:#fff;color:inherit}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--teal)}
+.sw{width:32px;height:32px;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 2px var(--mist);cursor:pointer;padding:0}
+.sw.sel{box-shadow:0 0 0 3px var(--plum)}
+.chip{border:2px solid var(--mist);background:#fff;border-radius:99px;padding:7px 14px;cursor:pointer;font:inherit;color:inherit}
+.chip.sel{border-color:var(--teal);background:var(--teal);color:#fff}
+#draw{width:100%;max-width:420px;aspect-ratio:1;border:2px dashed var(--mari);border-radius:14px;background:repeating-conic-gradient(#f4eef2 0 25%,#fff 0 50%) 0 0/24px 24px;touch-action:none;cursor:crosshair;display:block}
+.drop{border:2px dashed var(--teal);border-radius:14px;padding:30px;text-align:center;cursor:pointer;color:var(--teal);font-weight:600}
+.btn{border:0;border-radius:12px;padding:12px 20px;font:inherit;font-weight:700;cursor:pointer}
+.btn.p{background:var(--plum);color:#fff}.btn.m{background:var(--mari);color:var(--plum)}.btn.t{background:var(--teal);color:#fff}.btn.g{background:var(--mist);color:var(--plum)}
+.nav{display:flex;justify-content:space-between;margin-top:22px;gap:10px}
+.preview{position:sticky;top:16px;align-self:start}
+.preview svg{width:100%;height:auto;display:block}
+.stage{background:radial-gradient(circle at 50% 40%,#fff,var(--mist));border-radius:14px;position:relative}
+.tapnote{font-size:13px;text-align:center;color:var(--teal);font-weight:600;margin:6px 0}
+.sum{font-size:15px;margin-top:10px;border-top:1px solid var(--mist);padding-top:10px}
+.sum div{display:flex;justify-content:space-between;padding:2px 0}
+.sum .tot{font-weight:700;font-size:18px;color:var(--plum);border-top:1px dashed var(--mist);margin-top:6px;padding-top:6px}
+.qcard{border:2px solid var(--mist);border-radius:12px;padding:8px;text-align:center}.qcard b{color:var(--plum)}.qcard input{text-align:center;margin-top:4px}
+.disc{background:#FFF4E0;border-left:4px solid var(--mari);border-radius:10px;padding:10px 14px;margin-top:12px;font-size:14px}
+.disc .tiers{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}.disc .tiers span{background:#fff;border-radius:99px;padding:3px 10px;border:1px solid var(--mist)}.disc .tiers span.on{background:var(--teal);color:#fff;border-color:var(--teal)}
+.step{display:none}.step.on{display:block}
+.phone{position:fixed;inset:0;background:rgba(42,30,44,.6);display:none;align-items:center;justify-content:center;z-index:9}
+.phone.on{display:flex}
+.phone .ph{width:260px;height:500px;background:#111;border-radius:36px;padding:14px;box-shadow:0 20px 60px rgba(0,0,0,.4)}
+.phone .scr{background:var(--cream);height:100%;border-radius:26px;padding:24px 16px;text-align:center;display:flex;flex-direction:column;gap:10px;justify-content:center}
+.phone .ic{font-size:54px}
+.ok{text-align:center}
+.ok .big{font-size:60px}
+.flow{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:16px 0}
+.flow span{background:var(--mist);color:var(--plum);padding:6px 12px;border-radius:99px;font-size:14px;font-weight:600}
+.flow span.on{background:var(--teal);color:#fff}
+@keyframes glow{0%,100%{opacity:.4}50%{opacity:1}}
+.glowon{animation:glow 1.6s infinite}
+@keyframes swing{0%,100%{transform:rotate(-5deg)}50%{transform:rotate(5deg)}}
+#charmG{transform-box:fill-box}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">Tote<span>Tales</span></div>
+  <div class="tag">Your story, on a bag. Tap the charm to hear it.</div>
+  <div class="demo">DEMO · no real payments</div>
+</header>
+<nav class="steps" id="steps"></nav>
+<main>
+<section class="panel">
+
+  <!-- STEP 1 SIZE -->
+  <div class="step on" data-step="0">
+    <h2>1. Pick your bag</h2>
+    <p class="hint">Organic cotton tote. Size changes the print area and price.</p>
+    <div class="grid" id="sizes"></div>
+    <p class="hint" style="margin-top:12px">All bags are white organic cotton, so your design stands out.</p>
+  </div>
+
+  <!-- STEP 2 DESIGN -->
+  <div class="step" data-step="1">
+    <h2>2. Choose your design</h2>
+    <p class="hint">Pick a ready-made theme, upload your own art, or draw it right here.</p>
+    <div class="tabs" id="dtabs">
+      <button data-t="pre" class="on">Ready-made</button>
+      <button data-t="up">Upload</button>
+      <button data-t="draw">Draw</button>
+    </div>
+    <div id="t-pre"><div class="grid" id="designs"></div></div>
+    <div id="t-up" hidden>
+      <label class="drop" for="file">Click to upload PNG / JPG<br><small>(transparent PNG looks best)</small></label>
+      <input type="file" id="file" accept="image/*" hidden>
+    </div>
+    <div id="t-draw" hidden>
+      <canvas id="draw" width="600" height="600"></canvas>
+      <div class="row" id="pens"></div>
+      <div class="row">
+        <label>Brush <input type="range" id="brush" min="2" max="40" value="10"></label>
+        <button class="chip" id="eraser">Eraser</button>
+        <button class="chip" id="undo">Undo</button>
+        <button class="chip" id="clear">Clear</button>
+      </div>
+    </div>
+    <label class="l">Add text (optional)</label>
+    <div class="row">
+      <input type="text" id="txt" maxlength="28" placeholder="e.g. Chennai to Hamburg" style="flex:2">
+      <select id="font" style="flex:1"><option value="Cambria,Georgia,serif">Classic</option><option value="Impact,'Arial Black',sans-serif">Bold</option><option value="'Comic Sans MS','Segoe Print',cursive">Cute</option><option value="'Courier New',monospace">Typewriter</option></select>
+    </div>
+    <div class="row" id="txtcols"></div>
+  </div>
+
+  <!-- STEP 3 CHARM -->
+  <div class="step" data-step="2">
+    <h2>3. Design your NFC charm</h2>
+    <p class="hint">3D-printed charm with an NFC chip inside. Anyone taps it with a phone and your link opens.</p>
+    <label class="l">Shape</label><div class="row" id="shapes"></div>
+    <label class="l">Colour</label><div class="row" id="ccols"></div>
+    <label class="l">Initial</label>
+    <div class="row"><input type="text" id="initial" maxlength="2" value="A" style="width:90px">
+      <button class="chip" id="glow">Glow in the dark</button>
+      <button class="chip" id="nocharm">No charm</button></div>
+    <label class="l">Attach to</label><div class="row" id="attach"></div>
+    <label class="l">When someone taps it, open…</label><div class="row" id="taps"></div>
+    <input type="text" id="tapval" placeholder="" style="margin-top:8px">
+  </div>
+
+  <!-- STEP 4 ORDER -->
+  <div class="step" data-step="3">
+    <h2>4. Your details</h2>
+    <p class="hint">Mock checkout. Nothing is charged; you get the print file and order sheet.</p>
+    <label class="l">Name</label><input type="text" id="cname" placeholder="Your name">
+    <label class="l">Email</label><input type="email" id="cemail" placeholder="you@example.com">
+    <label class="l">How many bags of each size?</label>
+    <p class="hint" style="margin:0 0 6px">Same design on every bag. Mix sizes freely in one order.</p>
+    <div class="grid" id="qtys" style="grid-template-columns:repeat(4,1fr)"></div>
+    <div class="disc" id="discbox"></div>
+    <div class="row">
+      <div style="flex:2"><label class="l">Delivery</label><select id="ship"><option value="4.9">Standard (5–7 days) €4.90</option><option value="9.9">Express (2–3 days) €9.90</option><option value="0">Pick up at pop-up stall €0</option></select></div>
+    </div>
+    <label class="l">Note for us</label><textarea id="note" rows="2" placeholder="Gift? Deadline? Festival?"></textarea>
+  </div>
+
+  <!-- STEP 5 DONE -->
+  <div class="step" data-step="4">
+    <div class="ok">
+      <div class="big">🎉</div>
+      <h2>Order received!</h2>
+      <p class="hint" id="oid"></p>
+      <p>This is what lands with the ToteTales team:</p>
+      <div class="flow"><span class="on">Order sheet</span><span class="on">Print file (PNG)</span><span>DTF print</span><span>Heat press</span><span>3D print charm + NFC</span><span>Ship</span></div>
+      <div class="row" style="justify-content:center">
+        <button class="btn m" id="dlprint">⬇ Print file (PNG)</button>
+        <button class="btn t" id="dlorder">⬇ Order sheet (JSON)</button>
+        <button class="btn g" id="dlmock">⬇ Mockup image</button>
+      </div>
+      <p class="hint" style="margin-top:14px">In the real shop these would be emailed to the team automatically.</p>
+      <button class="btn p" id="again">Start a new bag</button>
+    </div>
+  </div>
+
+  <div class="nav" id="nav">
+    <button class="btn g" id="back">← Back</button>
+    <button class="btn p" id="next">Next →</button>
+  </div>
+</section>
+
+<aside class="panel preview">
+  <h3 style="color:var(--plum)">Live preview</h3>
+  <div class="stage" id="stage"></div>
+  <div class="tapnote" id="tapnote">📱 Click the charm to simulate a phone tap</div>
+  <div class="sum" id="sum"></div>
+</aside>
+</main>
+
+<div class="phone" id="phone"><div class="ph"><div class="scr" id="scr"></div></div></div>
+
+<script>
+const C={plum:'#3D1A3A',mari:'#F4A62A',coral:'#E85D75',teal:'#1A8C83',sage:'#9DB39A',ink:'#2A1E2C',cream:'#FBF7F2',mist:'#E6DCE3',white:'#FFFFFF'};
+const SIZES=[
+ {id:'S',name:'Small',dim:'30 × 35 cm',print:'20 × 20 cm',price:15,scale:.78},
+ {id:'M',name:'Medium',dim:'38 × 42 cm',print:'25 × 25 cm',price:18,scale:.88},
+ {id:'L',name:'Large',dim:'42 × 45 cm',print:'30 × 30 cm',price:22,scale:.95},
+ {id:'XL',name:'XL Shopper',dim:'50 × 40 × 15 cm',print:'35 × 35 cm',price:26,scale:1}];
+const BAGCOLS=[['White','#FAFAF7']];
+const PENS=['#3D1A3A','#F4A62A','#E85D75','#1A8C83','#9DB39A','#2A1E2C','#FFFFFF','#4A7BD0'];
+const SHAPES=['star','heart','lotus','moon','flower','circle'];
+const CCOLS=[['Marigold',C.mari],['Coral',C.coral],['Teal',C.teal],['Plum',C.plum],['Sage',C.sage],['Pearl','#F2EEE8']];
+const ATTACH=[['handle','Handle'],['side','Side seam'],['zip','Zip pull']];
+const TAPS=[['voice','🎙 Voice message','Record a 30-sec message (gift!)'],['music','🎵 Playlist','https://open.spotify.com/…'],['insta','📸 Instagram','@yourhandle'],['link','🔗 Any link','https://…'],['contact','👤 Contact card','Name, phone, email']];
+
+const S={step:0,size:'M',bag:'#FAFAF7',dtype:'pre',design:'mandala',upload:null,txt:'',font:'Cambria,Georgia,serif',tcol:C.plum,
+ charm:true,shape:'lotus',ccol:C.mari,initial:'A',glow:false,attach:'handle',tap:'voice',tapval:''};
+
+const $=s=>document.querySelector(s);
+const el=(t,a={},h='')=>{const e=document.createElement(t);Object.assign(e,a);if(h)e.innerHTML=h;return e};
+
+/* ---------- premade designs (drawn on canvas) ---------- */
+function petals(g,cx,cy,n,r1,r2,w,col){g.fillStyle=col;for(let i=0;i<n;i++){const a=i*2*Math.PI/n;g.save();g.translate(cx,cy);g.rotate(a);g.beginPath();g.moveTo(0,-r1);g.quadraticCurveTo(w,-(r1+r2)/2,0,-r2);g.quadraticCurveTo(-w,-(r1+r2)/2,0,-r1);g.fill();g.restore()}}
+const DESIGNS={
+ mandala:{n:'Mandala',d(g){const c=300;petals(g,c,c,16,150,270,40,C.plum);petals(g,c,c,16,130,230,26,C.mari);petals(g,c,c,12,80,170,34,C.coral);petals(g,c,c,8,40,110,30,C.teal);
+   g.fillStyle=C.mari;g.beginPath();g.arc(c,c,42,0,7);g.fill();g.fillStyle=C.plum;g.beginPath();g.arc(c,c,20,0,7);g.fill();
+   g.fillStyle=C.mari;for(let i=0;i<32;i++){const a=i*Math.PI/16;g.beginPath();g.arc(c+285*Math.cos(a),c+285*Math.sin(a),6,0,7);g.fill()}}},
+ kolam:{n:'Kolam',d(g){const n=5,s=90,o=300-(n-1)*s/2;g.fillStyle=C.plum;g.strokeStyle=C.coral;g.lineWidth=7;g.lineCap='round';
+   for(let i=0;i<n;i++)for(let j=0;j<n;j++){const x=o+i*s,y=o+j*s;const d=Math.abs(i-2)+Math.abs(j-2);if(d>2)continue;
+     g.beginPath();g.arc(x,y,7,0,7);g.fill();
+     g.beginPath();g.moveTo(x,y-s/2);g.quadraticCurveTo(x+s/2,y-s/2,x+s/2,y);g.quadraticCurveTo(x+s/2,y+s/2,x,y+s/2);g.quadraticCurveTo(x-s/2,y+s/2,x-s/2,y);g.quadraticCurveTo(x-s/2,y-s/2,x,y-s/2);g.stroke()}
+   g.strokeStyle=C.mari;g.lineWidth=6;g.beginPath();g.arc(300,300,265,0,7);g.stroke();
+   petals(g,300,300,4,200,280,30,C.teal)}},
+ genz:{n:'Gen Z',d(g){g.save();g.translate(300,300);g.rotate(-.08);g.fillStyle=C.coral;g.fillRect(-270,-150,540,300);
+   g.fillStyle='#fff';g.font='900 92px Impact,"Arial Black",sans-serif';g.textAlign='center';g.fillText('MAIN',0,-50);g.fillText('CHARACTER',0,45);
+   g.fillStyle=C.mari;g.fillText('ENERGY',0,140);g.restore();
+   g.fillStyle=C.teal;g.beginPath();g.arc(500,80,55,0,7);g.fill();g.fillStyle='#fff';g.font='bold 50px sans-serif';g.textAlign='center';g.fillText('✦',500,98);
+   g.fillStyle=C.plum;g.font='bold 34px sans-serif';g.fillText('no cap 🧢',140,560)}},
+ cute:{n:'Cute',d(g){g.fillStyle='#F7C6D0';g.beginPath();g.moveTo(170,200);g.lineTo(430,200);g.lineTo(395,520);g.quadraticCurveTo(300,550,205,520);g.closePath();g.fill();
+   g.fillStyle=C.plum;g.fillRect(150,175,300,35);g.fillStyle=C.teal;g.fillRect(330,60,22,130);
+   g.fillStyle=C.plum;for(const[x,y]of[[230,470],[270,490],[320,480],[360,465],[300,450],[250,440],[345,500]]){g.beginPath();g.arc(x,y,14,0,7);g.fill()}
+   g.fillStyle=C.ink;g.beginPath();g.arc(255,320,12,0,7);g.arc(345,320,12,0,7);g.fill();
+   g.strokeStyle=C.ink;g.lineWidth=6;g.beginPath();g.arc(300,340,22,.2,Math.PI-.2);g.stroke();
+   g.fillStyle=C.coral;g.globalAlpha=.6;g.beginPath();g.arc(225,350,16,0,7);g.arc(375,350,16,0,7);g.fill();g.globalAlpha=1;
+   g.fillStyle=C.mari;g.font='bold 40px "Comic Sans MS",cursive';g.textAlign='center';g.fillText('boba time!',300,120)}},
+ boho:{n:'Pinterest boho',d(g){const cols=[C.coral,C.mari,'#E9C7A8',C.sage,C.teal];g.lineWidth=34;
+   cols.forEach((c,i)=>{g.strokeStyle=c;g.beginPath();g.arc(300,420,220-i*40,Math.PI,0);g.stroke()});
+   g.fillStyle=C.mari;g.beginPath();g.arc(300,140,0,0,7);g.fill();
+   g.strokeStyle=C.plum;g.lineWidth=4;g.beginPath();g.moveTo(60,440);g.lineTo(540,440);g.stroke();
+   g.fillStyle=C.plum;g.font='italic 44px Cambria,Georgia,serif';g.textAlign='center';g.fillText('good vibes only',300,510);
+   g.fillStyle=C.mari;for(let i=0;i<12;i++){const a=Math.PI+i*Math.PI/11;g.save();g.translate(300+40*Math.cos(a),420+40*Math.sin(a));g.rotate(a+Math.PI/2);g.fillRect(-3,-40,6,30);g.restore()}}},
+ minimal:{n:'Minimal',d(g){g.strokeStyle=C.plum;g.lineWidth=6;g.lineCap='round';g.beginPath();g.moveTo(90,300);
+   for(let x=90;x<=510;x+=5)g.lineTo(x,300+40*Math.sin((x-90)/45));g.stroke();
+   g.fillStyle=C.mari;g.beginPath();g.arc(470,190,34,0,7);g.fill();
+   g.fillStyle=C.plum;g.font='26px Cambria,Georgia,serif';g.textAlign='center';g.fillText('s l o w   d o w n',300,420)}}
+};
+
+/* ---------- design composition ---------- */
+const print=el('canvas',{width:600,height:600});const pg=print.getContext('2d');
+const draw=$('#draw'),dg=draw.getContext('2d');let drawn=false;
+function compose(){pg.clearRect(0,0,600,600);
+ if(S.dtype==='pre')DESIGNS[S.design].d(pg);
+ else if(S.dtype==='up'&&S.upload){const im=S.upload,r=Math.min(600/im.width,600/im.height);const w=im.width*r,h=im.height*r;pg.drawImage(im,(600-w)/2,(600-h)/2,w,h)}
+ else if(S.dtype==='draw')pg.drawImage(draw,0,0);
+ if(S.txt){pg.fillStyle=S.tcol;pg.textAlign='center';let f=60;pg.font=`bold ${f}px ${S.font}`;while(pg.measureText(S.txt).width>560&&f>20){f-=4;pg.font=`bold ${f}px ${S.font}`}
+   pg.strokeStyle='rgba(255,255,255,.7)';pg.lineWidth=5;pg.strokeText(S.txt,300,585);pg.fillText(S.txt,300,585)}}
+
+/* ---------- charm shapes (svg paths, centred 0,0, ~r 30) ---------- */
+function shapePath(s){switch(s){
+ case'star':{let p='';for(let i=0;i<10;i++){const r=i%2?14:32,a=-Math.PI/2+i*Math.PI/5;p+=(i?'L':'M')+(r*Math.cos(a)).toFixed(1)+','+(r*Math.sin(a)).toFixed(1)}return p+'Z'}
+ case'heart':return'M0,28 C-40,0 -30,-30 0,-14 C30,-30 40,0 0,28Z';
+ case'lotus':return'M0,26 C-8,6 -8,-14 0,-30 C8,-14 8,6 0,26Z M0,26 C-16,14 -30,0 -32,-14 C-16,-12 -6,0 0,26Z M0,26 C16,14 30,0 32,-14 C16,-12 6,0 0,26Z M-30,24 Q0,34 30,24 Q0,18 -30,24Z';
+ case'moon':return'M8,-30 A30,30 0 1 0 8,30 A24,24 0 1 1 8,-30Z';
+ case'flower':{let p='';for(let i=0;i<6;i++){const a=i*Math.PI/3,x=18*Math.cos(a),y=18*Math.sin(a);p+=`M${(x+13).toFixed(1)},${y.toFixed(1)} A13,13 0 1 0 ${(x-13).toFixed(1)},${y.toFixed(1)} A13,13 0 1 0 ${(x+13).toFixed(1)},${y.toFixed(1)}Z`}return p+'M14,0 A14,14 0 1 0 -14,0 A14,14 0 1 0 14,0Z'}
+ default:return'M30,0 A30,30 0 1 0 -30,0 A30,30 0 1 0 30,0Z'}}
+function charmSVG(sz=1,extra=''){const light=['#F2EEE8',C.mari].includes(S.ccol);
+ return`<g transform="scale(${sz})" ${extra}>${S.glow?`<path d="${shapePath(S.shape)}" fill="#B6FF9E" class="glowon" filter="url(#blur)" transform="scale(1.25)"/>`:''}
+ <path d="${shapePath(S.shape)}" fill="${S.ccol}" stroke="${C.ink}" stroke-width="2" fill-rule="nonzero"/>
+ <text y="9" text-anchor="middle" font-family="Cambria,Georgia,serif" font-weight="700" font-size="22" fill="${light?C.plum:'#fff'}">${esc(S.initial)}</text>
+ <g transform="translate(18,18)"><circle r="8" fill="#fff" stroke="${C.teal}" stroke-width="2"/><path d="M-3,-3 a4,4 0 0 1 0,6 M0,-5 a7,7 0 0 1 0,10" stroke="${C.teal}" stroke-width="1.5" fill="none" transform="translate(-1,0)"/></g></g>`}
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+/* ---------- preview ---------- */
+function renderPreview(){compose();const sz=SIZES.find(x=>x.id===S.size);const k=sz.scale;const dark=['#222','#3D1A3A'].includes(S.bag);
+ const W=400,H=500,bw=280*k,bh=300*k,bx=(W-bw)/2,by=170+(300-bh);
+ const hx1=bx+bw*.25,hx2=bx+bw*.75;const pa=bw*.72*(sz.id==='XL'?1:1),px=(W-pa)/2,py=by+(bh-pa)/2+6;
+ const att={handle:[hx2+bw*.06,by-70*k],side:[bx+bw,by+30],zip:[W/2,by+4]}[S.attach];
+ const img=print.toDataURL();
+ $('#stage').innerHTML=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">
+ <defs><filter id="blur"><feGaussianBlur stdDeviation="5"/></filter><filter id="sh"><feDropShadow dx="0" dy="6" stdDeviation="8" flood-opacity=".18"/></filter>
+ <linearGradient id="fold" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#000" stop-opacity=".12"/><stop offset=".08" stop-color="#000" stop-opacity="0"/></linearGradient></defs>
+ <path d="M${hx1-14},${by} C${hx1-14},${by-150*k} ${hx2+14},${by-150*k} ${hx2+14},${by}" fill="none" stroke="${shade(S.bag)}" stroke-width="16" stroke-linecap="round"/>
+ <path d="M${hx1-14},${by} C${hx1-14},${by-150*k} ${hx2+14},${by-150*k} ${hx2+14},${by}" fill="none" stroke="${S.bag}" stroke-width="11" stroke-linecap="round"/>
+ <path d="M${bx},${by} L${bx+bw},${by} L${bx+bw+6},${by+bh-12} Q${bx+bw+6},${by+bh} ${bx+bw-8},${by+bh} L${bx+8},${by+bh} Q${bx-6},${by+bh} ${bx-6},${by+bh-12} Z" fill="${S.bag}" stroke="${shade(S.bag)}" stroke-width="2" filter="url(#sh)"/>
+ <rect x="${bx}" y="${by}" width="${bw}" height="${bh}" fill="url(#fold)"/>
+ <line x1="${bx}" y1="${by+10}" x2="${bx+bw}" y2="${by+10}" stroke="${dark?'#ffffff33':'#00000022'}" stroke-dasharray="4 4"/>
+ <image href="${img}" x="${px}" y="${py}" width="${pa}" height="${pa}" style="mix-blend-mode:${dark?'normal':'multiply'}"/>
+ ${S.charm?`<g id="charmG" style="cursor:pointer"><circle cx="${att[0]}" cy="${att[1]}" r="5" fill="none" stroke="#B8B0A0" stroke-width="3"/>
+ <line x1="${att[0]}" y1="${att[1]+4}" x2="${att[0]}" y2="${att[1]+38}" stroke="#B8B0A0" stroke-width="3" stroke-dasharray="3 2"/>
+ <g transform="translate(${att[0]},${att[1]+70})">${charmSVG(1.05)}</g></g>`:''}
+ <text x="${W/2}" y="${H-10}" text-anchor="middle" font-size="13" fill="#6b5a68">${sz.name} · ${sz.dim} · print ${sz.print}</text></svg>`;
+ const cg=$('#charmG');if(cg)cg.onclick=tap;$('#tapnote').style.visibility=S.charm?'visible':'hidden';renderSum()}
+function shade(h){if(h.length===4)h='#'+[...h.slice(1)].map(c=>c+c).join('');const n=parseInt(h.slice(1),16);const f=v=>Math.max(0,Math.round(v*.82));return`rgb(${f(n>>16)},${f(n>>8&255)},${f(n&255)})`}
+
+const QTY={S:0,M:0,L:0,XL:0};QTY[S.size]=1;let qtyTouched=false;
+function price(){const sz=SIZES.find(x=>x.id===S.size);const custom=S.dtype!=='pre'?3:0;const charm=S.charm?(8+(S.glow?2:0)):0;const txt=S.txt?2:0;
+ if(!qtyTouched){for(const k in QTY)QTY[k]=0;QTY[S.size]=1}
+ const extras=custom+charm+txt;const lines=SIZES.filter(z=>QTY[z.id]>0).map(z=>({z,n:QTY[z.id],unit:z.price+extras}));
+ const q=lines.reduce((a,l)=>a+l.n,0);const disc=q>=20?.15:q>=10?.1:0;const ship=+($('#ship')?.value||4.9);const sub=lines.reduce((a,l)=>a+l.n*l.unit,0);
+ return{sz,custom,charm,txt,extras,lines,q,disc,sub,ship,total:sub*(1-disc)+(q?ship:0)}}
+const eur=v=>'€'+v.toFixed(2);
+function renderSum(){const p=price();
+ $('#sum').innerHTML=p.lines.map(l=>`<div><span>${l.n} × ${l.z.name} tote</span><span>${eur(l.n*l.z.price)}</span></div>`).join('')+`
+ ${p.custom?`<div><span>Your own design × ${p.q}</span><span>${eur(p.custom*p.q)}</span></div>`:''}${p.txt?`<div><span>Custom text × ${p.q}</span><span>${eur(p.txt*p.q)}</span></div>`:''}
+ ${p.charm?`<div><span>NFC charm${S.glow?' (glow)':''} × ${p.q}</span><span>${eur(p.charm*p.q)}</span></div>`:''}
+ ${p.disc?`<div style="color:var(--teal);font-weight:700"><span>Bulk −${p.disc*100}% (${p.q} bags)</span><span>−${eur(p.sub*p.disc)}</span></div>`:''}
+ <div><span>Delivery</span><span>${eur(p.q?p.ship:0)}</span></div>
+ <div class="tot"><span>Total</span><span>${eur(p.total)}</span></div>`;
+ const nxt=p.q<10?`Add ${10-p.q} more bag${10-p.q>1?'s':''} (any size) to get 10% off.`:p.q<20?`Add ${20-p.q} more (any size) to get 15% off.`:'You have the best bulk price.';
+ $('#discbox').innerHTML=`<b>Bulk discount counts every bag in the order, same size or mixed sizes.</b> Example: 4 S + 3 M + 3 L = 10 bags, so 10% off. ${nxt}
+ <div class="tiers"><span class="${p.q<10?'on':''}">1–9 bags: full price</span><span class="${p.q>=10&&p.q<20?'on':''}">10–19: −10%</span><span class="${p.q>=20?'on':''}">20+: −15%</span></div>`;
+ SIZES.forEach(z=>{const i=$('#q-'+z.id);if(i&&document.activeElement!==i)i.value=QTY[z.id]})}
+
+/* ---------- phone tap simulation ---------- */
+function tap(){const t=TAPS.find(x=>x[0]===S.tap);const v=S.tapval||t[2];const ic={voice:'🎙',music:'🎵',insta:'📸',link:'🔗',contact:'👤'}[S.tap];
+ $('#scr').innerHTML=`<svg viewBox="-45 -45 90 90" width="90" style="margin:auto">${charmSVG(1)}</svg><small style="color:#6b5a68">NFC tag detected</small>
+ <div class="ic">${ic}</div><b style="color:var(--plum)">${t[1].slice(2)}</b><div style="word-break:break-all;font-size:14px">${esc(v)}</div>
+ ${S.tap==='voice'?'<div style="background:var(--plum);color:#fff;border-radius:99px;padding:10px">▶ 0:00 ━━━━━━ 0:30</div>':'<div style="background:var(--teal);color:#fff;border-radius:10px;padding:10px">Open</div>'}
+ <small style="color:#6b5a68;margin-top:10px">tap anywhere to close</small>`;$('#phone').classList.add('on')}
+$('#phone').onclick=()=>$('#phone').classList.remove('on');
+
+/* ---------- UI builders ---------- */
+function pick(container,items,key,render,after){const box=$(container);box.innerHTML='';items.forEach(it=>{const b=render(it);b.onclick=()=>{S[key]=b.dataset.v;box.querySelectorAll('.sel').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');after&&after();renderPreview()};if(b.dataset.v===S[key])b.classList.add('sel');box.appendChild(b)})}
+const swatch=(n,c)=>{const b=el('button',{className:'sw',title:n});b.style.background=c;b.dataset.v=c;return b};
+const chip=(v,t)=>{const b=el('button',{className:'chip'},t);b.dataset.v=v;return b};
+
+pick('#sizes',SIZES,'size',s=>{const b=el('button',{className:'card'},`<b>${s.id}</b>${s.name}<br><small>${s.dim}</small><br><small>from €${s.price}</small>`);b.dataset.v=s.id;return b});
+pick('#designs',Object.entries(DESIGNS),'design',([k,d])=>{const b=el('button',{className:'card'});const cv=el('canvas',{width:600,height:600});d.d(cv.getContext('2d'));b.append(cv,el('div',{},d.n));b.dataset.v=k;return b});
+pick('#txtcols',[['Plum',C.plum],['Marigold',C.mari],['Coral',C.coral],['Teal',C.teal],['White','#FFFFFF'],['Black','#111']],'tcol',([n,c])=>swatch(n,c));
+pick('#shapes',SHAPES,'shape',s=>{const b=el('button',{className:'card',style:'width:74px;padding:6px'});b.innerHTML=`<svg viewBox="-36 -36 72 72" width="50"><path d="${shapePath(s)}" fill="${C.mari}" stroke="${C.ink}" stroke-width="2"/></svg><small>${s}</small>`;b.dataset.v=s;return b});
+pick('#ccols',CCOLS,'ccol',([n,c])=>swatch(n,c));
+pick('#attach',ATTACH,'attach',([v,t])=>chip(v,t));
+pick('#taps',TAPS,'tap',([v,t])=>chip(v,t),()=>{$('#tapval').value='';S.tapval='';setTapPh()});
+function setTapPh(){$('#tapval').placeholder=TAPS.find(x=>x[0]===S.tap)[2]}setTapPh();
+$('#tapval').oninput=e=>S.tapval=e.target.value;
+$('#initial').oninput=e=>{S.initial=e.target.value.toUpperCase();renderPreview()};
+$('#glow').onclick=e=>{S.glow=!S.glow;e.target.classList.toggle('sel',S.glow);renderPreview()};
+$('#nocharm').onclick=e=>{S.charm=!S.charm;e.target.classList.toggle('sel',!S.charm);renderPreview()};
+$('#txt').oninput=e=>{S.txt=e.target.value;renderPreview()};
+$('#font').onchange=e=>{S.font=e.target.value;renderPreview()};
+SIZES.forEach(z=>{const d=el('div',{className:'qcard'},`<b>${z.id}</b> <small>€${z.price}</small>`);const i=el('input',{type:'number',min:0,max:500,id:'q-'+z.id});
+ i.oninput=()=>{qtyTouched=true;QTY[z.id]=Math.max(0,parseInt(i.value)||0);renderSum()};d.appendChild(i);$('#qtys').appendChild(d)});
+$('#ship').oninput=renderSum;
+
+document.querySelectorAll('#dtabs button').forEach(b=>b.onclick=()=>{S.dtype=b.dataset.t;document.querySelectorAll('#dtabs button').forEach(x=>x.classList.toggle('on',x===b));
+ ['pre','up','draw'].forEach(t=>$('#t-'+t).hidden=t!==S.dtype);renderPreview()});
+$('#file').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{S.upload=im;renderPreview()};im.src=r.result};r.readAsDataURL(f)};
+
+/* ---------- drawing ---------- */
+let pen=C.plum,erase=false,down=false,hist=[],last;
+pick('#pens',PENS.map(c=>['',c]),'_pen',([n,c])=>swatch(n,c),()=>{pen=S._pen;erase=false;$('#eraser').classList.remove('sel')});S._pen=pen;$('#pens .sw').classList.add('sel');
+function pos(e){const r=draw.getBoundingClientRect();return[(e.clientX-r.left)*600/r.width,(e.clientY-r.top)*600/r.height]}
+draw.onpointerdown=e=>{down=true;draw.setPointerCapture(e.pointerId);hist.push(dg.getImageData(0,0,600,600));if(hist.length>30)hist.shift();last=pos(e);stroke(e)};
+draw.onpointermove=e=>{if(down)stroke(e)};
+draw.onpointerup=draw.onpointercancel=()=>{down=false;renderPreview()};
+function stroke(e){const p=pos(e);dg.globalCompositeOperation=erase?'destination-out':'source-over';dg.strokeStyle=pen;dg.lineWidth=+$('#brush').value;dg.lineCap=dg.lineJoin='round';
+ dg.beginPath();dg.moveTo(...last);dg.lineTo(...p);dg.stroke();last=p;clearTimeout(stroke.t);stroke.t=setTimeout(renderPreview,120)}
+$('#eraser').onclick=e=>{erase=!erase;e.target.classList.toggle('sel',erase)};
+$('#undo').onclick=()=>{if(hist.length){dg.putImageData(hist.pop(),0,0);renderPreview()}};
+$('#clear').onclick=()=>{hist.push(dg.getImageData(0,0,600,600));dg.clearRect(0,0,600,600);renderPreview()};
+
+/* ---------- steps ---------- */
+const NAMES=['Bag','Design','Charm','Checkout','Done'];
+function go(n){S.step=n;document.querySelectorAll('.step').forEach(s=>s.classList.toggle('on',+s.dataset.step===n));
+ $('#steps').innerHTML='';NAMES.forEach((t,i)=>{const b=el('button',{className:i===n?'on':i<n?'done':''},`${i<n?'✓':i+1} ${t}`);b.onclick=()=>{if(n<4&&i<4)go(i)};$('#steps').appendChild(b)});
+ $('#nav').style.display=n===4?'none':'flex';$('#back').style.visibility=n?'visible':'hidden';$('#next').textContent=n===3?'Place order ✓':'Next →';$('#next').className='btn '+(n===3?'m':'p');window.scrollTo({top:0,behavior:'smooth'})}
+$('#back').onclick=()=>go(S.step-1);
+let order;
+$('#next').onclick=()=>{if(S.step===1&&S.dtype==='up'&&!S.upload){alert('Upload an image first, or pick a ready-made design.');return}
+ if(S.step<3)return go(S.step+1);
+ const name=$('#cname').value.trim(),email=$('#cemail').value.trim();if(!name||!/^\S+@\S+\.\S+$/.test(email)){alert('Please add your name and a valid email.');return}
+ const p=price();if(!p.q){alert('Add at least one bag.');return}const id='TT-'+Date.now().toString(36).toUpperCase().slice(-6);
+ order={orderId:id,date:new Date().toISOString(),customer:{name,email,note:$('#note').value},
+  bags:p.lines.map(l=>({size:l.z.id,quantity:l.n,dimensions:l.z.dim,printArea:l.z.print,unitEUR:l.unit})),bagColour:BAGCOLS.find(b=>b[1]===S.bag)[0],bulkDiscount:p.disc,
+  design:{type:{pre:'ready-made',up:'uploaded',draw:'hand-drawn'}[S.dtype],theme:S.dtype==='pre'?DESIGNS[S.design].n:null,text:S.txt||null,printFile:id+'_print.png'},
+  charm:S.charm?{shape:S.shape,colour:CCOLS.find(c=>c[1]===S.ccol)[0],initial:S.initial,glow:S.glow,attachTo:S.attach,nfcAction:S.tap,nfcValue:S.tapval||null}:null,
+  quantity:p.q,delivery:$('#ship').selectedOptions[0].text,totalEUR:+p.total.toFixed(2)};
+ $('#oid').textContent=`Order ${id} · ${p.lines.map(l=>l.n+' '+l.z.id).join(' + ')} = ${p.q} bags · ${eur(p.total)} (demo, not charged)`;go(4)};
+function dl(name,url){const a=el('a',{href:url,download:name});document.body.appendChild(a);a.click();a.remove()}
+$('#dlprint').onclick=()=>{const hi=el('canvas',{width:3000,height:3000});const g=hi.getContext('2d');g.imageSmoothingQuality='high';g.drawImage(print,0,0,3000,3000);dl(order.orderId+'_print.png',hi.toDataURL('image/png'))};
+$('#dlorder').onclick=()=>dl(order.orderId+'_order.json',URL.createObjectURL(new Blob([JSON.stringify(order,null,2)],{type:'application/json'})));
+$('#dlmock').onclick=()=>{const svg=$('#stage svg').outerHTML;const im=new Image();im.onload=()=>{const c=el('canvas',{width:800,height:1000});const g=c.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,800,1000);g.drawImage(im,0,0,800,1000);dl(order.orderId+'_mockup.png',c.toDataURL())};
+ im.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg.includes('xmlns=')?svg:svg.replace('<svg','<svg xmlns="http://www.w3.org/2000/svg"'))};
+$('#again').onclick=()=>location.reload();
+
+go(0);renderPreview();
+</script>
+</body>
+</html>
